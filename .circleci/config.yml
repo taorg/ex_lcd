@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: elixir:1.4
+      - image: cthree87/docker-elixir-ci:latest
 
     working_directory: ~/ex_lcd
 
