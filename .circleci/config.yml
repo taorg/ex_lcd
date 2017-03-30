@@ -22,7 +22,7 @@ jobs:
 
   deploy_hex:
     docker:
-      - image: elixir:1.4
+      - image: cthree87/docker-elixir-ci:latest
 
     working_directory: ~/ex_lcd_deploy
 
@@ -32,11 +32,13 @@ jobs:
       - run: mix local.rebar --force
       - run: mix deps.get
       - run: mix deps.compile
-      # - run: mix hex.auth something something??
 
       # Deploy to Hex
       - deploy:
         command: |
           if [ ${CIRCLE_BRANCH} == "master" ]; then
-            # publish the package release here...
+            # Hex authentication expect script
+            expect .circleci/hex_auth.expect
+            # Publish the new release to hex
+            expect .circleci/hex_publish.expect
           fi

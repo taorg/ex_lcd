@@ -1,0 +1,24 @@
+#!/usr/bin/expect
+
+set timeout 9
+set hex_password "$env(HEX_PW)"
+log_user 0
+
+spawn mix hex.publish
+
+expect {
+  "Password:"
+}
+
+send "$hex_password\r"
+
+log_user 1
+
+expect {
+  "*[Yn]?"
+}
+
+send "Y\r"
+
+wait
+close
