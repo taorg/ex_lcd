@@ -25,8 +25,7 @@ defmodule ExLCD.Mixfile do
 
   defp deps do
     [
-      # {:elixir_ale, "~> 0.7"},
-      {:elixir_ale, git: "https://github.com/fhunleth/elixir_ale.git", branch: "osx"},
+      {:elixir_ale, "~> 0.6.1"},
       {:ex_doc, "~> 0.11", only: [:dev]}
     ]
   end

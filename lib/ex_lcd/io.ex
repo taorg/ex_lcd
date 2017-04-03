@@ -27,12 +27,12 @@ end
 
 defmodule ExLCD.I2C do
   @moduledoc false
-  
   use GenServer
 
 end
 
 defmodule ExLCD.SPI do
+  @moduledoc false
   use GenServer
 
 end
