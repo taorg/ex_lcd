@@ -24,7 +24,7 @@ If you wish to support a new type of display module, fix or report a bug, add a 
 
 ## Acknowledgements
 
-Many thanks to [@tmecklem](https://github.com/tmecklem) for inspiration and encouragement. ExLCD started as his **elixir_lcd** package. While none of the original code remains, his guidance and advice is greatly appreciated.
+Many thanks to [@tmecklem](https://github.com/tmecklem) for inspiration and encouragement. ExLCD started as his **elixir_lcd** package.
 
 ## License
 
@@ -34,10 +34,9 @@ Licensed under the [Apache-2.0](https://choosealicense.com/licenses/apache-2.0/)
 
 **ExLCD** [is available in Hex](https://hex.pm/docs/publish), the package can be installed as a dependency of your project:
 
-  1. Add **ex_lcd** and **elixir_ale** to your list of dependencies in `mix.exs`:
+  1. Add **ex_lcd** to your list of dependencies in `mix.exs`:
           def deps do
-            [{:elixir_ale, "~> 0.6"},
-             {:ex_lcd, "~> 0.3.2"}]
+            [{:ex_lcd, "~> 0.4.0"}]
           end
 
   2. Ensure **ex_lcd** is started before your application:
