@@ -15,3 +15,5 @@ config :ex_lcd, lcd: %{
   cols: 20,
   font_5x10: false
 }
+
+import_config "#{Mix.env}.exs"
