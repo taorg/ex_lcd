@@ -35,12 +35,16 @@ Licensed under the [Apache-2.0](https://choosealicense.com/licenses/apache-2.0/)
 **ExLCD** [is available in Hex](https://hex.pm/docs/publish), the package can be installed as a dependency of your project:
 
   1. Add **ex_lcd** to your list of dependencies in `mix.exs`:
-          def deps do
-            [{:ex_lcd, "~> 0.4.0"}]
-          end
+  ```elixir
+      def deps do
+        [{:ex_lcd, "~> 0.4.0"}]
+      end
+  ```
 
   2. Ensure **ex_lcd** is started before your application:
-          def application(_target) do
-            [mod: {MyApplication.Application, []},
-             extra_applications: [:ex_lcd]]
-          end
+  ```elixir
+      def application(_target) do
+        [mod: {MyApplication.Application, []},
+         extra_applications: [:ex_lcd]]
+      end
+  ```
