@@ -1,6 +1,32 @@
-_build/
-cover/
-deps/
-doc/
+/.vagrant
+*.log
+
+### Elixir ###
+/_build
+/cover
+/deps
+/doc
+/.fetch
 erl_crash.dump
 *.ez
+*.beam
+/.elixir_ls
+/_nerves-tmp/*
+
+### Erlang ###
+.eunit
+deps
+*.o
+*.plt
+ebin/*.beam
+rel/example_project
+.concrete/DEV_MODE
+.rebar
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history
