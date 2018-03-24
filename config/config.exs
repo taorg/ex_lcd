@@ -16,4 +16,4 @@ use Mix.Config
 #   font_5x10: false
 # }
 
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"

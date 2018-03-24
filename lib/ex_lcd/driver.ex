@@ -23,17 +23,20 @@ defmodule ExLCD.Driver do
   # Redefine defp when testing to expose private functions
   @doc false
   defmacro defp(definition, do: body) do
-    case Mix.env do
-      :test -> quote do
-        Kernel.def(unquote(definition)) do
-          unquote(body)
+    case Mix.env() do
+      :test ->
+        quote do
+          Kernel.def unquote(definition) do
+            unquote(body)
+          end
         end
-      end
-      _ -> quote do
-        Kernel.defp(unquote(definition)) do
-          unquote(body)
+
+      _ ->
+        quote do
+          Kernel.defp unquote(definition) do
+            unquote(body)
+          end
         end
-      end
     end
   end
 

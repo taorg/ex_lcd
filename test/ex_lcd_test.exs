@@ -2,8 +2,8 @@ defmodule ExLCDTest do
   use ExUnit.Case
 
   test "start_link starts a genserver and initializes its state" do
-      assert {:ok, pid} = ExLCD.start_link({TestDriver, %{}})
-      assert Process.alive?(pid)
+    assert {:ok, pid} = ExLCD.start_link({TestDriver, %{}})
+    assert Process.alive?(pid)
   end
 
   describe "cast operations" do

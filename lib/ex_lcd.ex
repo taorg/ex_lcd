@@ -25,8 +25,7 @@ defmodule ExLCD do
   """
   use GenServer
 
-  @type feature :: :display | :cursor | :blink | :autoscroll |
-                   :rtl_text | :ltr_text
+  @type feature :: :display | :cursor | :blink | :autoscroll | :rtl_text | :ltr_text
   @type bitmap :: list
 
   defmodule LCDState do
@@ -97,7 +96,7 @@ defmodule ExLCD do
       :ok
     ```
   """
-  @spec move_to(row::integer, col::integer) :: :ok
+  @spec move_to(row :: integer, col :: integer) :: :ok
   def move_to(row, col), do: cast({:set_cursor, row, col})
 
   @doc """
@@ -117,6 +116,7 @@ defmodule ExLCD do
   def write(content) when is_binary(content) do
     cast({:print, content})
   end
+
   def write(content), do: cast({:write, content})
 
   @doc """
@@ -241,30 +241,39 @@ defmodule ExLCD do
   @doc false
   def handle_cast(:clear, state), do: execute({:clear, []}, state)
   def handle_cast(:home, state), do: execute({:home, []}, state)
+
   def handle_cast({:set_cursor, row, col}, state) do
     execute({:set_cursor, {row, col}}, state)
   end
+
   def handle_cast({:print, content}, state) do
     execute({:print, content}, state)
   end
+
   def handle_cast({:write, content}, state) do
     execute({:write, content}, state)
   end
+
   def handle_cast({:scroll, cols}, state) do
     execute({:scroll, cols}, state)
   end
+
   def handle_cast({:right, cols}, state) do
     execute({:right, cols}, state)
   end
+
   def handle_cast({:left, cols}, state) do
     execute({:left, cols}, state)
   end
+
   def handle_cast({:char, idx, bitmap}, state) when idx in 0..7 and length(bitmap) === 8 do
     execute({:char, idx, bitmap}, state)
   end
+
   def handle_cast({:enable, feature}, state) do
     execute({feature, :on}, state)
   end
+
   def handle_cast({:disable, feature}, state) do
     execute({feature, :off}, state)
   end

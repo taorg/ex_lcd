@@ -2,17 +2,19 @@ defmodule ExLCD.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :ex_lcd,
-     version: "0.4.0",
-     elixir: "~> 1.4",
-     description: description(),
-     package: package(),
-     docs: [extras: ["README.md"]],
-     aliases: ["docs": ["docs", &copy_images/1]],
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     elixirc_paths: elixirc_paths(Mix.env),
-     deps: deps()]
+    [
+      app: :ex_lcd,
+      version: "0.4.0",
+      elixir: "~> 1.4",
+      description: description(),
+      package: package(),
+      docs: [extras: ["README.md"]],
+      aliases: [docs: ["docs", &copy_images/1]],
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
+      deps: deps()
+    ]
   end
 
   # Specifies which paths to compile per environment.
@@ -25,7 +27,7 @@ defmodule ExLCD.Mixfile do
 
   defp deps do
     [
-      {:elixir_ale, "~> 0.6.1"},
+      {:elixir_ale, "~> 1.0"},
       {:ex_doc, "~> 0.11", only: [:dev]}
     ]
   end
@@ -48,6 +50,6 @@ defmodule ExLCD.Mixfile do
 
   # Copy the images referenced by docs, since ex_doc doesn't do this.
   defp copy_images(_) do
-    File.cp_r "assets", "doc/assets"
+    File.cp_r("assets", "doc/assets")
   end
 end

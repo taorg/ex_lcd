@@ -74,39 +74,39 @@ defmodule ExLCD.HD44780 do
   use ExLCD.Driver
   use ExLCD.IO
 
-  @low    0
-  @high   1
+  @low 0
+  @high 1
 
   # Function set flags
-  @mode_4bit  0x01
-  @mode_8bit  0x00
-  @font_5x8   0x00
-  @font_5x10  0x04
-  @lines_1    0x00
-  @lines_2    0x08
+  @mode_4bit 0x01
+  @mode_8bit 0x00
+  @font_5x8 0x00
+  @font_5x10 0x04
+  @lines_1 0x00
+  @lines_2 0x08
 
   # Command flags
-  @cmd_clear        0x01
-  @cmd_home         0x02
+  @cmd_clear 0x01
+  @cmd_home 0x02
   @cmd_entrymodeset 0x04
-  @cmd_dispcontrol  0x08
-  @cmd_cursorshift  0x10
-  @cmd_functionset  0x20
+  @cmd_dispcontrol 0x08
+  @cmd_cursorshift 0x10
+  @cmd_functionset 0x20
   @cmd_setcgramaddr 0x40
   @cmd_setddramaddr 0x80
 
   # Entry mode flags
-  @entry_left       0x02
-  @entry_increment  0x01
+  @entry_left 0x02
+  @entry_increment 0x01
 
   # Display control flags
-  @ctl_display      0x04
-  @ctl_cursor       0x02
-  @ctl_blink        0x01
+  @ctl_display 0x04
+  @ctl_cursor 0x02
+  @ctl_blink 0x01
 
   # Shift flags
-  @shift_display    0x08
-  @shift_right      0x04
+  @shift_display 0x08
+  @shift_right 0x04
 
   @pins_4bit [:rs, :en, :d4, :d5, :d6, :d7]
   @pins_8bit [:d0, :d1, :d2, :d3]
@@ -122,11 +122,11 @@ defmodule ExLCD.HD44780 do
   @doc false
   def stop(display) do
     {:ok, display} = command(display, {:display, :off})
-    [ :rs_pid, :en_pid,
-      :d0_pid, :d1_pid, :d2_pid, :d3_pid,
-      :d4_pid, :d5_pid, :d6_pid, :d7_pid ]
-    |>  Enum.filter(fn x -> not is_nil(display[x]) end)
-    |>  Enum.each(fn x -> @gpio.release(display[x]) end)
+
+    [:rs_pid, :en_pid, :d0_pid, :d1_pid, :d2_pid, :d3_pid, :d4_pid, :d5_pid, :d6_pid, :d7_pid]
+    |> Enum.filter(fn x -> not is_nil(display[x]) end)
+    |> Enum.each(fn x -> @gpio.release(display[x]) end)
+
     :ok
   end
 
@@ -143,51 +143,56 @@ defmodule ExLCD.HD44780 do
     # validate and unpack the config
     config |> validate_config!()
 
-    bits = case config[:d0] do
-      nil  ->  @mode_4bit
-      _    ->  @mode_8bit
-    end
+    bits =
+      case config[:d0] do
+        nil -> @mode_4bit
+        _ -> @mode_8bit
+      end
 
-    lines = case config.rows do
-      1 ->  @lines_1
-      _ ->  @lines_2
-    end
+    lines =
+      case config.rows do
+        1 -> @lines_1
+        _ -> @lines_2
+      end
 
-    font = case config[:font_5x10] do
-      true  ->  @font_5x10
-      _     ->  @font_5x8
-    end
+    font =
+      case config[:font_5x10] do
+        true -> @font_5x10
+        _ -> @font_5x8
+      end
 
-    pins = case bits do
-      @mode_8bit  ->  @pins_4bit ++ @pins_8bit
-      _           ->  @pins_4bit
-    end
+    pins =
+      case bits do
+        @mode_8bit -> @pins_4bit ++ @pins_8bit
+        _ -> @pins_4bit
+      end
 
     starting_function_state = @cmd_functionset ||| bits ||| font ||| lines
 
-    display = Map.merge(config, %{
-      function_set: starting_function_state,
-      display_control: @cmd_dispcontrol,
-      entry_mode: @cmd_entrymodeset,
-      shift_control: @cmd_cursorshift
-    })
+    display =
+      Map.merge(config, %{
+        function_set: starting_function_state,
+        display_control: @cmd_dispcontrol,
+        entry_mode: @cmd_entrymodeset,
+        shift_control: @cmd_cursorshift
+      })
 
     display
-    |>  reserve_gpio_pins(pins)
-    |>  rs(@low)
-    |>  en(@low)
-    |>  poi(bits)
-    |>  set_feature(:function_set)
-    |>  clear()
+    |> reserve_gpio_pins(pins)
+    |> rs(@low)
+    |> en(@low)
+    |> poi(bits)
+    |> set_feature(:function_set)
+    |> clear()
   end
 
   # setup GPIO output pins, add the pids to the config and return
   defp reserve_gpio_pins(config, pins) do
     config
-    |>  Map.take(pins)
-    |>  Enum.map(fn {k, v} -> {String.to_atom("#{k}_pid"), start_pin(v, :output)} end)
-    |>  Map.new()
-    |>  Map.merge(config)
+    |> Map.take(pins)
+    |> Enum.map(fn {k, v} -> {String.to_atom("#{k}_pid"), start_pin(v, :output)} end)
+    |> Map.new()
+    |> Map.merge(config)
   end
 
   # start ElixirALE.GPIO GenServer to manage a GPIO pin and return the pid
@@ -201,18 +206,18 @@ defmodule ExLCD.HD44780 do
   # safe and do it anyway.
   defp poi(state, @mode_4bit) do
     state
-    |>  write_4_bits(0x03)
-    |>  write_4_bits(0x03)
-    |>  write_4_bits(0x03)
-    |>  write_4_bits(0x02)
+    |> write_4_bits(0x03)
+    |> write_4_bits(0x03)
+    |> write_4_bits(0x03)
+    |> write_4_bits(0x02)
   end
 
   # POI for 8 bit mode
   defp poi(state, @mode_8bit) do
     state
-    |>  set_feature(:function_set)
-    |>  set_feature(:function_set)
-    |>  set_feature(:function_set)
+    |> set_feature(:function_set)
+    |> set_feature(:function_set)
+    |> set_feature(:function_set)
   end
 
   defp validate_config!(config) do
@@ -241,50 +246,63 @@ defmodule ExLCD.HD44780 do
 
   defp command(display, {:write, content}) do
     content
-    |>  Enum.each(fn(x) -> write_a_byte(display, x, @high) end)
+    |> Enum.each(fn x -> write_a_byte(display, x, @high) end)
+
     {:ok, display}
   end
 
   defp command(display, {:set_cursor, {row, col}}) do
     {:ok, set_cursor(display, {row, col})}
   end
+
   defp command(display, {:cursor, :off}) do
     {:ok, disable_feature_flag(display, :display_control, @ctl_cursor)}
   end
+
   defp command(display, {:cursor, :on}) do
     {:ok, enable_feature_flag(display, :display_control, @ctl_cursor)}
   end
+
   defp command(display, {:blink, :off}) do
     {:ok, disable_feature_flag(display, :display_control, @ctl_blink)}
   end
+
   defp command(display, {:blink, :on}) do
     {:ok, enable_feature_flag(display, :display_control, @ctl_blink)}
   end
+
   defp command(display, {:display, :off}) do
     {:ok, disable_feature_flag(display, :display_control, @ctl_display)}
   end
+
   defp command(display, {:display, :on}) do
     {:ok, enable_feature_flag(display, :display_control, @ctl_display)}
   end
+
   defp command(display, {:autoscroll, :off}) do
     {:ok, disable_feature_flag(display, :entry_mode, @entry_increment)}
   end
+
   defp command(display, {:autoscroll, :on}) do
     {:ok, enable_feature_flag(display, :entry_mode, @entry_increment)}
   end
+
   defp command(display, {:rtl_text, :on}) do
     {:ok, disable_feature_flag(display, :entry_mode, @entry_left)}
   end
+
   defp command(display, {:ltr_text, :on}) do
     {:ok, enable_feature_flag(display, :entry_mode, @entry_left)}
   end
 
   # Scroll the entire display left (-) or right (+)
   defp command(display, {:scroll, 0}), do: {:ok, display}
+
   defp command(display, {:scroll, cols}) when cols < 0 do
     write_a_byte(display, @cmd_cursorshift ||| @shift_display)
     command(display, {:scroll, cols + 1})
   end
+
   defp command(display, {:scroll, cols}) do
     write_a_byte(display, @cmd_cursorshift ||| @shift_display ||| @shift_right)
     command(display, {:scroll, cols - 1})
@@ -292,6 +310,7 @@ defmodule ExLCD.HD44780 do
 
   # Scroll(move) cursor right
   defp command(display, {:right, 0}), do: {:ok, display}
+
   defp command(display, {:right, cols}) do
     write_a_byte(display, @cmd_cursorshift ||| @shift_right)
     command(display, {:right, cols - 1})
@@ -299,6 +318,7 @@ defmodule ExLCD.HD44780 do
 
   # Scroll(move) cursor left
   defp command(display, {:left, 0}), do: {:ok, display}
+
   defp command(display, {:left, cols}) do
     write_a_byte(display, @cmd_cursorshift)
     command(display, {:left, cols - 1})
@@ -306,10 +326,12 @@ defmodule ExLCD.HD44780 do
 
   # Program custom character to CGRAM
   defp command(display, {:char, idx, bitmap}) when idx in 0..7 and length(bitmap) === 8 do
-    write_a_byte(display, @cmd_setcgramaddr ||| (idx <<< 3))
+    write_a_byte(display, @cmd_setcgramaddr ||| idx <<< 3)
+
     for line <- bitmap do
       write_a_byte(display, line, @high)
     end
+
     {:ok, display}
   end
 
@@ -322,14 +344,14 @@ defmodule ExLCD.HD44780 do
 
   defp clear(display) do
     display
-    |>  write_a_byte(@cmd_clear)
-    |>  delay(3_000)
+    |> write_a_byte(@cmd_clear)
+    |> delay(3_000)
   end
 
   defp home(display) do
     display
-    |>  write_a_byte(@cmd_home)
-    |>  delay(3_000)
+    |> write_a_byte(@cmd_home)
+    |> delay(3_000)
   end
 
   # DDRAM is organized as two 40 byte rows. In a 2x display the first row
@@ -341,7 +363,7 @@ defmodule ExLCD.HD44780 do
   # row_offsets/1 determines the starting DDRAM address of each display row
   # and returns a map for up to 4 rows.
   defp row_offsets(cols) do
-    %{ 0 => 0x00, 1 => 0x40, 2 => 0x00 + cols, 3 => 0x40 + cols }
+    %{0 => 0x00, 1 => 0x40, 2 => 0x00 + cols, 3 => 0x40 + cols}
   end
 
   # Set the DDRAM address corresponding to the {row,col} position
@@ -349,19 +371,19 @@ defmodule ExLCD.HD44780 do
     col = min(col, display[:cols] - 1)
     row = min(row, display[:rows] - 1)
     %{^row => offset} = row_offsets(display[:cols])
-    write_a_byte(display, @cmd_setddramaddr ||| (col + offset))
+    write_a_byte(display, @cmd_setddramaddr ||| col + offset)
   end
 
   # Switch a register flag bit OFF(0). Return the updated state.
   defp disable_feature_flag(state, feature, flag) do
-    %{state | feature => (state[feature] &&& ~~~flag)}
-    |>  set_feature(feature)
+    %{state | feature => state[feature] &&& ~~~flag}
+    |> set_feature(feature)
   end
 
   # Switch a register flag bit ON(1). Return the updated state.
   defp enable_feature_flag(state, feature, flag) do
-    %{state | feature => (state[feature] ||| flag)}
-    |>  set_feature(feature)
+    %{state | feature => state[feature] ||| flag}
+    |> set_feature(feature)
   end
 
   # Write a feature register to the controller and return the state.
@@ -374,11 +396,14 @@ defmodule ExLCD.HD44780 do
     display |> rs(rs_value) |> delay(1_000)
 
     case display[:d0] do
-      nil -> display
-             |>  write_4_bits(byte_to_write >>> 4)
-             |>  write_4_bits(byte_to_write)
-      _   -> display
-             |>  write_8_bits(byte_to_write)
+      nil ->
+        display
+        |> write_4_bits(byte_to_write >>> 4)
+        |> write_4_bits(byte_to_write)
+
+      _ ->
+        display
+        |> write_8_bits(byte_to_write)
     end
   end
 
@@ -416,9 +441,9 @@ defmodule ExLCD.HD44780 do
 
   defp pulse_en(display) do
     display
-    |>  en(@low)
-    |>  en(@high)
-    |>  en(@low)
+    |> en(@low)
+    |> en(@high)
+    |> en(@low)
   end
 
   def delay(display, microseconds) do
