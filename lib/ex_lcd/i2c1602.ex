@@ -1,4 +1,9 @@
 defmodule ExLCD.I2C1602 do
+  @moduledoc """
+  Provides math-related functions.
+
+  ## Examples
+
   alias ExLCD.I2C1602.Display
   import ExLCD.I2C1602.Commands
 
@@ -57,55 +62,55 @@ defmodule ExLCD.I2C1602 do
 
   @spec start(map) :: Display
   def start(config) do
-    lines =
-      case config.rows do
-        1 -> @lcd_1line
-        _ -> @lcd_2line
-      end
+   lines =
+     case config.rows do
+       1 -> @lcd_1line
+       _ -> @lcd_2line
+     end
 
-    font =
-      case config[:font_5x10] do
-        true -> @lcd_5x10
-        _ -> @lcd_5x8
-      end
+   font =
+     case config[:font_5x10] do
+       true -> @lcd_5x10
+       _ -> @lcd_5x8
+     end
 
-    device =
-      case config[:i2c_device] do
-        val -> val
-        _ -> "i2c-1"
-      end
+   device =
+     case config[:i2c_device] do
+       val -> val
+       _ -> "i2c-1"
+     end
 
-    %Display{
-      lines: lines,
-      lcd_display_function: @lcd_4bitmode ||| lines || font,
-      i2c_pid: pid
-    }
+   %Display{
+     lines: lines,
+     lcd_display_function: @lcd_4bitmode ||| lines || font,
+     i2c_pid: pid
+   }
   end
 
   @spec stop(Display) :: :ok
   def stop(display) do
-    :ok
+   :ok
   end
 
   # specs for commands using this driver should be:
   # function(I2C1602.Display, operation) :: I2C1602.Display
   @doc false
   def execute do
-    &command/2
+   &command/2
   end
-end
+  end
 
-defmodule ExLCD.I2C1602.Display do
+  defmodule ExLCD.I2C1602.Display do
   defstruct i2c_device: "i2c-1",
-            i2c_address: 0x27,
-            i2c_pid: nil,
-            lines: 2,
-            backlight_value: @lcd_nobacklight,
-            display_function: @lcd_4bitmode ||| @lcd_1line ||| @lcd_5x8dots,
-            display_mode: @lcd_entryleft ||| @lcd_entryshiftdecrement
-end
+           i2c_address: 0x27,
+           i2c_pid: nil,
+           lines: 2,
+           backlight_value: @lcd_nobacklight,
+           display_function: @lcd_4bitmode ||| @lcd_1line ||| @lcd_5x8dots,
+           display_mode: @lcd_entryleft ||| @lcd_entryshiftdecrement
+  end
 
-defmodule ExLCD.I2C1602.Commands do
+  defmodule ExLCD.I2C1602.Commands do
   require ExLCD.I2C1602.Constants
   alias ExLCD.I2C1602.Display
 
@@ -113,13 +118,13 @@ defmodule ExLCD.I2C1602.Commands do
   def command(display, _), do: {:unsupported, display}
 
   def command(display, {:clear, _params}) do
-    clear(display)
-    {:ok, display}
+   clear(display)
+   {:ok, display}
   end
 
   def command(display, {:home, _params}) do
-    home(display)
-    {:ok, display}
+   home(display)
+   {:ok, display}
   end
 
   # --- Private Functions ---
@@ -131,43 +136,44 @@ defmodule ExLCD.I2C1602.Commands do
   end
 
   defp send(display, value) do
-    send(value, 0)
+   send(value, 0)
   end
 
   # --- Low-level Functions
   defp send(display, value, mode) do
-    display
-    |> write_four_bits(<<(value &&& 0xF0) ||| mode>>)
-    |> write_four_bits(<<(value <<< 4 &&& 0xF0) ||| mode>>)
+   display
+   |> write_four_bits(<<(value &&& 0xF0) ||| mode>>)
+   |> write_four_bits(<<(value <<< 4 &&& 0xF0) ||| mode>>)
   end
 
   defp write_four_bits(display, data) do
-    display
-    |> expander_write(display, data)
-    |> pulse_enable(display, data)
+   display
+   |> expander_write(display, data)
+   |> pulse_enable(display, data)
   end
 
   @spec expander_write(Display, binary) :: Display
   defp expander_write(display, data) do
-    %Diaplay{i2c_pid: pid, backlight_value: backlight} = display
-    @i2c.write(pid, <<data ||| backlight>>)
+   %Diaplay{i2c_pid: pid, backlight_value: backlight} = display
+   @i2c.write(pid, <<data ||| backlight>>)
 
-    display
+   display
   end
 
   defp pulse_enable(display, data) do
-    display
-    |> expander_write(<<data ||| @en>>)
-    |> delay(1)
-    |> expander_write(<<data ||| ~~~@en>>)
-    |> delay(50)
+   display
+   |> expander_write(<<data ||| @en>>)
+   |> delay(1)
+   |> expander_write(<<data ||| ~~~@en>>)
+   |> delay(50)
   end
 
   def delay(display, microseconds) do
-    # Unfortunately, BEAM does not provides microsecond precision
-    # And if we need waiting, we MUST wait
-    ms = max(round(microseconds / 1000), 1)
-    Process.sleep(ms)
-    display
+   # Unfortunately, BEAM does not provides microsecond precision
+   # And if we need waiting, we MUST wait
+   ms = max(round(microseconds / 1000), 1)
+   Process.sleep(ms)
+   display
   end
+  """
 end

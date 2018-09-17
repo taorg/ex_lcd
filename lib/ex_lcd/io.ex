@@ -28,9 +28,17 @@ end
 defmodule ExLCD.I2C do
   @moduledoc false
   use GenServer
+
+  def init(args) do
+    {:ok, args}
+  end
 end
 
 defmodule ExLCD.SPI do
   @moduledoc false
   use GenServer
+
+  def init(args) do
+    {:ok, args}
+  end
 end
