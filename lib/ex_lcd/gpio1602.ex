@@ -46,7 +46,7 @@ defmodule ExLCD.GPIO1602 do
   # CharDisplay.Driver Behaviour
   #
 
-  def start(config \\ @lcd) do
+  def start(config) do
     init(config)
   end
 
